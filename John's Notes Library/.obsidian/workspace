@@ -4,14 +4,14 @@
     "type": "split",
     "children": [
       {
-        "id": "b41a5a42d6bc28aa",
+        "id": "62602233e0e49b0b",
         "type": "leaf",
         "state": {
           "type": "markdown",
           "state": {
-            "file": "CG/Complete Program/Realistic Real-Time Human Rendering.md",
+            "file": "Poetry/Classical Chinese Poetry.md",
             "mode": "source",
-            "source": true
+            "source": false
           }
         }
       }
@@ -77,7 +77,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "CG/Complete Program/Realistic Real-Time Human Rendering.md",
+                "file": "Poetry/Classical Chinese Poetry.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -94,7 +94,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "CG/Complete Program/Realistic Real-Time Human Rendering.md",
+                "file": "Poetry/Classical Chinese Poetry.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -117,7 +117,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "CG/Complete Program/Realistic Real-Time Human Rendering.md"
+                "file": "Poetry/Classical Chinese Poetry.md"
               }
             }
           }
@@ -128,9 +128,14 @@
     "width": 300,
     "collapsed": true
   },
-  "active": "b41a5a42d6bc28aa",
+  "active": "62602233e0e49b0b",
   "lastOpenFiles": [
-    "CG/Rendering Algorithm/AA/FXAA.md",
-    "CG/Complete Program/Realistic Real-Time Human Rendering.md"
+    "CG/Rendering Algorithm/Realistic Real-Time Human Rendering.md",
+    "Poetry/Classical Chinese Poetry.md",
+    "assets/img/Poetry/梦游天姥吟留别-李白.jpg.md",
+    "Math/Liner Algebra.md",
+    "assets/img/梦游天姥吟留别-李白_1.jpg.md",
+    "assets/img/philly-magic-garden.jpg.md",
+    "CG/Rendering Algorithm/AA/FXAA.md"
   ]
 }

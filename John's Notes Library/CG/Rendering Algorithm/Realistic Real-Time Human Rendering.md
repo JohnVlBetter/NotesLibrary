@@ -85,7 +85,7 @@ float KS_Skin_Specular(float3 N,//表面法线
 $$I\ast\left(\sum_{i=1}^k\omega_iG(\nu_i,\space r)\right)$$
 &nbsp;&nbsp;&nbsp;&nbsp;其中G为高斯项，$r = \sqrt[]{x^2+y^2}$，$I$为辐照度。
 &nbsp;&nbsp;&nbsp;&nbsp;由于我们假定材质是均匀的，即散射光在各个方向均相同，因此漫反射剖面是径向均匀的，而高斯项是仅有的既同时可分又径向对称的发散函数。每个高斯卷积纹理可以分开计算且提供的拟合是精确地，这些纹理的带权和可以精确地对原始且不可分函数所得到的较长2D卷积进行近似，这样就可使用可分卷积的和来对不可分卷积做近似。而且两个高斯项的卷积仍然是一个高斯项，这就允许通过对上一个辐照度纹理的结果进行卷积来生成下一个纹理，这样便可通过越来越宽的高斯项对原始图像进行卷积操作，而不会增加每步中tap的数量。两个分别具有变量$\nu_1$和$\nu_2$的径向高斯项按如下方式进行卷积:
-$$\begin{split}`  G(\nu_1,\space r) \ast G(\nu_2,\space r) &= \int_0^\infty\int_0^\infty G\left(\nu_1,\space\sqrt[]{x'^2+y'^2} \right) G\left(\nu_2,\space\sqrt[]{(x-x')^2 +(y-y')^2} \right) \,{\rm d}x'\,{\rm d}y' \\
+$$\begin{split}G(\nu_1,\space r) \ast G(\nu_2,\space r) &= \int_0^\infty\int_0^\infty G\left(\nu_1,\space\sqrt[]{x'^2+y'^2} \right) G\left(\nu_2,\space\sqrt[]{(x-x')^2 +(y-y')^2} \right) \,{\rm d}x'\,{\rm d}y' \\
 &= G(\nu_1+\nu_2,\space r)\end{split}$$
 &nbsp;&nbsp;&nbsp;&nbsp;对一个漫反射剖面使用几个高斯项拟合时，要恒定地把一个宽度大致设置为之前的两倍（方差大约以4的倍数改变），在每步中使用7个tap就相当合适。
 
