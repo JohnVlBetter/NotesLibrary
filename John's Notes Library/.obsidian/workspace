@@ -9,8 +9,8 @@
         "state": {
           "type": "markdown",
           "state": {
-            "file": "Poetry/Classical Chinese Poetry.md",
-            "mode": "source",
+            "file": "CG/Rendering Algorithm/Realistic Real-Time Human Rendering.md",
+            "mode": "preview",
             "source": false
           }
         }
@@ -77,7 +77,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "Poetry/Classical Chinese Poetry.md",
+                "file": "CG/Rendering Algorithm/Realistic Real-Time Human Rendering.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -94,7 +94,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "Poetry/Classical Chinese Poetry.md",
+                "file": "CG/Rendering Algorithm/Realistic Real-Time Human Rendering.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -117,7 +117,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "Poetry/Classical Chinese Poetry.md"
+                "file": "CG/Rendering Algorithm/Realistic Real-Time Human Rendering.md"
               }
             }
           }
@@ -130,12 +130,14 @@
   },
   "active": "62602233e0e49b0b",
   "lastOpenFiles": [
+    "2022-09-04.md",
     "CG/Rendering Algorithm/Realistic Real-Time Human Rendering.md",
+    "Math/Liner Algebra.md",
+    "assets/img/Poetry/梦游天姥吟留别-李白.jpeg",
+    "CG/Rendering Algorithm/AA/FXAA.md",
     "Poetry/Classical Chinese Poetry.md",
     "assets/img/Poetry/梦游天姥吟留别-李白.jpg.md",
-    "Math/Liner Algebra.md",
     "assets/img/梦游天姥吟留别-李白_1.jpg.md",
-    "assets/img/philly-magic-garden.jpg.md",
-    "CG/Rendering Algorithm/AA/FXAA.md"
+    "assets/img/philly-magic-garden.jpg.md"
   ]
 }
