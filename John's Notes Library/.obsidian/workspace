@@ -4,13 +4,13 @@
     "type": "split",
     "children": [
       {
-        "id": "62602233e0e49b0b",
+        "id": "e1e7a37bb7659ec1",
         "type": "leaf",
         "state": {
           "type": "markdown",
           "state": {
             "file": "CG/Rendering Algorithm/Realistic Real-Time Human Rendering.md",
-            "mode": "preview",
+            "mode": "source",
             "source": false
           }
         }
@@ -125,10 +125,9 @@
       }
     ],
     "direction": "horizontal",
-    "width": 300,
-    "collapsed": true
+    "width": 300
   },
-  "active": "62602233e0e49b0b",
+  "active": "e1e7a37bb7659ec1",
   "lastOpenFiles": [
     "2022-09-04.md",
     "CG/Rendering Algorithm/Realistic Real-Time Human Rendering.md",

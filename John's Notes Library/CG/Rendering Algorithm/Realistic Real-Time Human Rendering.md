@@ -232,8 +232,55 @@ float4 finalSkinShader(float3 position:POSITION,
    return float4(diffuseLight + specularLight, 1.0);  
 }
 ```
-
-
+&nbsp;&nbsp;&nbsp;&nbsp;纹理缝隙会对纹理空间散射带来麻烦，因为在网格上连接的区域在纹理空间上并不相连，不能够容易的在它们之间漫反射。纹理空间上的空区域将沿每个缝隙边模糊到网格上，在渲染阶段，将卷积后的辐照度纹理应用回网格上时，就造成了失真。如果使用的UV映射充满了整个纹理空间，那基本看不出难以接受的结果。
+&nbsp;&nbsp;&nbsp;&nbsp;在渲染中我们需要保持精确的能量守恒，由于我们渲染的是皮肤，因此我们只讨论次表面散射的情况。次表面散射的所有可用能量精确地等于所有未被镜面BRDF所直接反射的能量。一次镜面反射计算给出总的输入能量从单个方向反射出的比例。要计算镜面反射所使用的的总能量，所有的出射方向都必须考虑到。因此在将光照存储到辐照度纹理中之前，需要沿半球所有方向整合镜面反射量，并将漫反射光亮与剩余的能量相乘。若$f_r$为镜面BRDF，L为位于表面$x$位置的光向量且$\omega_o$为半球中关于N的向量，那么就可以用下面的式子为每个光照减少漫反射光
+$$\rho_{dt}(x,L) = 1-\int_{2\pi}f_r(x,\omega_o,L)(\omega_o\cdot N)\,{\rm d}\omega_o$$
+&nbsp;&nbsp;&nbsp;&nbsp;使用球面坐标，上式的积分计算方法为
+$$\int_0^{2\pi}\int_0^{\pi/2}f_r(x,\omega_o,L)(\omega_o\cdot N)sin(\theta)\,{\rm d}\theta\,{\rm d}\phi$$
+&nbsp;&nbsp;&nbsp;&nbsp;这个值会根据位置$x$处的粗糙度$m$，及$N\cdot L$而改变。我们从镜面BRDF中移除$\rho_s$常数，并预计算式2中的积分。由于一致采样的缘故，这仅仅是对2D积分的粗糙估计。一致采样积分对于精确度较高的值而言效果尤其差，但这样的数值在我们的皮肤着色器中并没有用到。预计算可以在下述程序中执行得出。
+```hlsl
+float computeRhodtTex(float2 tex : TEXCOORD0)  
+{  
+	//在半球表面对镜面反射BRDF分量进行积分  
+	float costheta = tex.x;  
+	float pi = 3.14159265358979324;  
+	float m = tex.y;  
+	float sum = 0.0;  
+	//更多的项可用来得到更高的精确度  
+	int numterms = 80;  
+	float3 N = float3(0.0,0.0,1.0);  
+	float3 V = float3(0.0,sqrt(1.0 - costheta * costheta), costheta);  
+	for(int i = 0; i < numterms; ++i)  
+	{      
+		float phip = float(i) / float(numterms - 1) * 2.0 * pi;  
+		float localsum = 0.0f;  
+		float cosp = cos(phip);  
+		float sinp = sin(phip);  
+		for(int j = 0; j < numterms; ++j)  
+		{         
+			float thetap = float(j) / float(numterms - 1) * pi * 0.5;  
+			float sint = sin(thetap);  
+			float cost = cos(thetap);  
+			float3 L = float3(sinp * sint, cosp * sint, cost);  
+			localsum += KS_Skin_Specular(V, N, L, m, 0.0277778)
+				 * sint;  
+		}      
+		sum += localsum * (pi * 0.5) / float(numterms);  
+	}   
+	return sum * (pi * 2.0) / (float(numterms));  
+}
+```
+&nbsp;&nbsp;&nbsp;&nbsp;我们可以通过使用这个$\rho_{dt}$纹理来修改漫反射光照计算。在产生辐照度纹理时，对每个光源执行一次。环境光照并没有L方向，在技术上应该乘以一个基于$\rho_{dt}$半球积分的常数，但由于这仅为一个常数（除了基于$m$的变量）并且很可能接近于1.0，因此不必进行计算。正确的结果可以通过使用$\rho_{dt}$的方向依赖性对原始立方体贴图进行卷积来替代仅仅使用$N\cdot L$而得到。下程序可使用$\rho_{dt}$纹理来计算一个点光源的漫反射辐照度。
+```hlsl
+float ndotL[i] = dot(N, L[i]);  
+float3 finalLightColor[i] = LColor[i] * LShadow[i];  
+float3 Ldiffsue[i] = saturate(ndotL[i]) * finalLightColor[i];  
+float3 rho_dt_L[i] = 1.0 - rho_s * 
+	f1tex2D(rhodTex, float2(ndotL[i], m));  
+irradiance += Ldiffsue[i] * rho_dt_L[i];
+```
+&nbsp;&nbsp;&nbsp;&nbsp;光照在表面之下发散之后，它必须穿过由BRDF支配的同样的粗糙接触面，并且方向效果在此再次生效。基于我们从表面观察的方向(基于$N\cdot V$)，一个不同的漫反射光照量将逃逸。由于我们使用了对漫反射的近似，因此可以将逃逸的光照看作等量地沿着各方向流出，如它们到达表面时一样。因此另一个积分项必须考虑一个由入射方向组成的半球，以及一个射出的V方向。由于基于物理的BRDF可逆，我们就可以重复使用同一个$\rho_{dt}$项，但这次索引基于V，而非L，如最终渲染路径的片段着色器代码的最后所展示的。
+&nbsp;&nbsp;&nbsp;&nbsp;能量保持的一个不足之处就是没有考虑到互反射，导致模型丢失了应当在颧骨区域中不断反弹的光亮，这些光亮会照亮鼻子的边缘。使用预计算的辐照度传递可以捕捉这样的互反射，但是该技术不支持变动的或者可变的模型，因此不能应用于人体。
 
 
 
