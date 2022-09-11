@@ -281,6 +281,51 @@ irradiance += Ldiffsue[i] * rho_dt_L[i];
 ```
 &nbsp;&nbsp;&nbsp;&nbsp;光照在表面之下发散之后，它必须穿过由BRDF支配的同样的粗糙接触面，并且方向效果在此再次生效。基于我们从表面观察的方向(基于$N\cdot V$)，一个不同的漫反射光照量将逃逸。由于我们使用了对漫反射的近似，因此可以将逃逸的光照看作等量地沿着各方向流出，如它们到达表面时一样。因此另一个积分项必须考虑一个由入射方向组成的半球，以及一个射出的V方向。由于基于物理的BRDF可逆，我们就可以重复使用同一个$\rho_{dt}$项，但这次索引基于V，而非L，如最终渲染路径的片段着色器代码的最后所展示的。
 &nbsp;&nbsp;&nbsp;&nbsp;能量保持的一个不足之处就是没有考虑到互反射，导致模型丢失了应当在颧骨区域中不断反弹的光亮，这些光亮会照亮鼻子的边缘。使用预计算的辐照度传递可以捕捉这样的互反射，但是该技术不支持变动的或者可变的模型，因此不能应用于人体。
+&nbsp;&nbsp;&nbsp;&nbsp;纹理空间漫反射不会完全捕捉光透过薄区域（如耳朵、鼻翼等）的传播情况。在这些薄区域中，两个表面的三维空间可能很接近，但是在纹理空间中却可能相隔很远。我们可使用一种方法对半透明阴影贴图（translucent shadow maps）进行修改，重用卷积后的辐照度纹理对穿过薄区域的漫反射进行高效地估计。
+&nbsp;&nbsp;&nbsp;&nbsp;与传统半透明阴影贴图不同的是，我们渲染向光表面的$z$和$(u,v)$坐标这允许在阴影中的每点计算透过对象的厚度，并在表面另一侧访问卷积后的辐照度纹理。我们在一个三分量的阴影贴图中存储向光表面的$z$和$(u,v)$坐标，这使得阴影中的区域可以计算透过表面的深度，并访问另一侧光照的模糊版本。
+![阴影内区域C计算在位置B传输的光线](/assets/img/CG/RealisticReal-TimeHumanRendering/阴影内区域C计算在位置B传输的光线.jpg "阴影内区域C计算在位置B传输的光线")
+&nbsp;&nbsp;&nbsp;&nbsp;如上图所示，对于任意处于阴影中的位置$C$，TSM提供了向光表面上点$A$的距离$m$和UV坐标。我们希望对$C$处射出的散射光进行估计，其为剖面$R$上向光点的卷积，其中从距离$C$到每个样本的距离分别单独计算。对$B$进行计算式，实际上容易很多，对于较小的角度$\theta$，$B$将十分接近于$C$。对于较大的$\theta$，Fresnel和$N\cdot L$项将使得影响效果很小，并隐藏了大部分错误，因此很可能会并不值得计算$C$点的正确数值。计算$B$处的散射，向光表面上距$A$点$r$距离的任意样本需要使用下面的卷积：
+$$\begin{split}R\left(\sqrt{r^2+d^2}\right) &=
+\sum_{i=1}^k\omega_iG\left(\nu_i,\sqrt{r^2+d^2}\right) \\ &=
+\sum_{i=1}^k\omega_ie^{-d^2/v_i}G(\nu_i,r)\end{split}$$
+&nbsp;&nbsp;&nbsp;&nbsp;之前已经利用过三维空间中高斯项的可分性将关于$\sqrt{r^2+d^2}$的函数变换到关于$r$的函数。由于向光点已经在$A$处由$G(\nu_i,r)$进行了卷积，这一步十分方便。因此在位置$C$（使用$B$来代替进行估算）处射出的总漫反射光量为$k$次纹理查找（对存储在TSM中位置$A$使用$(u,v)$）的和，每次纹理查找的权重由$\omega_i$和一个基于$\nu_i$和$d$的指数项决定。由于每个高斯项在高斯和漫反射剖面可分，因此这种变换是有效的。
+&nbsp;&nbsp;&nbsp;&nbsp;在阴影贴图计算得到的深度值$m$被$cos(\theta)$修正，这是因为使用了对漫反射的近似。通过对比$A$和$C$处的表面法线，这种修正只会在发现朝向相反时用到。当两个法线相互垂直时，使用一个lerp操作将混合修正回原始的距离$m$。虽然设定是一个平整的平面，但是应用到非平整的平面上效果也相当好。
+&nbsp;&nbsp;&nbsp;&nbsp;目前的方式会有一些问题，因为我们只考虑了光透过对象的一条路径。由TSM计算得到的深度中的高频变化可能导致输出中的高频失真，这不应该出现在高度散射的半透明效果中，因为半透明效果模糊了所有的传播光，所以不应该出现尖锐的效果。我们可以通过将透过表面的深度存储在辐照度纹理的alpha通道中，其随着辐照度纹理在表面被模糊。在计算全局散射时，每个高斯项使用对应深度的模糊版本。而要将距离值压缩到一个8位的通道中，可以将常数$d$存储为exp(-const * d)，沿表面对深度的这个指数进行卷积，并在查找时对其取反。程序如下图所示：
+```hlsl
+float4 computeIrradianceTexture()
+{   
+	float distanceToLight = length(worldPointLight0Pos – worldCoord);   
+	float4 TSMTap = f4tex2D(TSMTex, TSMCoord.xy / TSMCoord.w);
+	// Find normal on back side of object, Ni
+	float3 Ni = f3tex2D(normalTex, TSMTap.yz) * float3(2.0, 2.0, 2.0) 
+		- float3(1.0, 1.0, 1.0);
+	float backFacingEst = saturate(-dot(Ni, N));   
+	float thicknessToLight = distanceToLight - TSMTap.x;   
+	// Set a large distance for surface points facing the light    
+	if( ndotL1 > 0.0 )   
+	{     
+		thicknessToLight = 50.0;   
+	}   
+	float correctedThickness = saturate(-ndotL1) * thicknessToLight;
+	float finalThickness = lerp(thicknessToLight, correctedThickness,
+		backFacingEst);
+	// Exponentiate thickness value for storage as 8-bit alpha    
+	float alpha = exp(finalThickness * -20.0);   
+	return float4(irradiance, alpha); 
+}
+```
+&nbsp;&nbsp;&nbsp;&nbsp;对于多光源和环境光照，我们理应为每个光照生成卷积后的辐照度纹理并分开存储，但是这会消耗更多的纹理内存。对此我们可以计算所有透过表面深度的最小值，并沿表面对此积分。这虽然只是一个近似，但在多光源情况下，算法消耗不会随光源数目而成倍增加。
+&nbsp;&nbsp;&nbsp;&nbsp;用于对子表面散射卷积进行加速的技术同样适用于其他不可分的卷积，如布隆过滤器。Pharr and Humphreys 2004 推荐了一个$(1-r/d)^4$的布隆过滤器，来向最终渲染的图像增加光晕效果。虽然这个过滤器是不可分的，但可以通过两个高斯项的和对其进行出色的模拟，并且同样的用于改进纹理空间漫反射的可分、层次化卷积技术。对于d=1，$(1-r^4)$可通过$0.0174G(0.008,r)+0.192G(0.0576,r)$来很好地近似。
+#### 结论
+&nbsp;&nbsp;&nbsp;&nbsp;新算法基于纹理空间漫反射和半透明阴影贴图生成了高真实感的人皮肤图像。对于大部分角色使用至多6个高斯项对漫反射剖面进行模拟在外观上就已足够。可以使用一个细节等级系统来将多个漫反射精度在不同距离进行切换，来更好的避免明显的效果跳变。最终的渲染效果如下图所示：
+![最终结果](/assets/img/CG/RealisticReal-TimeHumanRendering/result.jpg "最终结果")
+
+
+
+
+
+
+
 
 
 

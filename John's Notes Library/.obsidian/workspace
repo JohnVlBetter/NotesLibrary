@@ -9,7 +9,7 @@
         "state": {
           "type": "markdown",
           "state": {
-            "file": "Movie/Roman Holiday.md",
+            "file": "CG/Rendering Algorithm/Realistic Real-Time Human Rendering.md",
             "mode": "source",
             "source": false
           }
@@ -77,7 +77,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "Movie/Roman Holiday.md",
+                "file": "CG/Rendering Algorithm/Realistic Real-Time Human Rendering.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -94,7 +94,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "Movie/Roman Holiday.md",
+                "file": "CG/Rendering Algorithm/Realistic Real-Time Human Rendering.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -117,11 +117,12 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "Movie/Roman Holiday.md"
+                "file": "CG/Rendering Algorithm/Realistic Real-Time Human Rendering.md"
               }
             }
           }
-        ]
+        ],
+        "currentTab": 3
       }
     ],
     "direction": "horizontal",
@@ -129,15 +130,15 @@
   },
   "active": "e1e7a37bb7659ec1",
   "lastOpenFiles": [
+    "assets/img/CG/RealisticReal-TimeHumanRendering/阴影内区域C计算在位置B传输的光线.jpg",
     "CG/Rendering Algorithm/Realistic Real-Time Human Rendering.md",
-    "Math/Liner Algebra.md",
     "Movie/Roman Holiday.md",
     "Poetry/Classical Chinese Poetry.md",
-    "CG/Rendering Algorithm/AA/FXAA.md",
+    "assets/img/CG/Realistic Real-Time Human Rendering/阴影内区域C计算在位置B传输的光线.jpg",
+    "assets/img.md",
+    "Math/Liner Algebra.md",
     "assets/img/Poetry/梦游天姥吟留别-李白.jpeg",
-    "2022-09-04.md",
-    "assets/img/Poetry/梦游天姥吟留别-李白.jpg.md",
-    "assets/img/梦游天姥吟留别-李白_1.jpg.md",
-    "assets/img/philly-magic-garden.jpg.md"
+    "CG/Rendering Algorithm/AA/FXAA.md",
+    "2022-09-04.md"
   ]
 }
