@@ -9,8 +9,8 @@
         "state": {
           "type": "markdown",
           "state": {
-            "file": "Movie/Roman Holiday.md",
-            "mode": "source",
+            "file": "CG/GaussianBlur.md",
+            "mode": "preview",
             "source": false
           }
         }
@@ -77,7 +77,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "Movie/Roman Holiday.md",
+                "file": "CG/GaussianBlur.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -94,7 +94,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "Movie/Roman Holiday.md",
+                "file": "CG/GaussianBlur.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -117,7 +117,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "Movie/Roman Holiday.md"
+                "file": "CG/GaussianBlur.md"
               }
             }
           }
@@ -130,15 +130,15 @@
   },
   "active": "e1e7a37bb7659ec1",
   "lastOpenFiles": [
-    "CG/English.md",
     "CG/Realistic Real-Time Human Rendering.md",
-    "CG/English/未命名.md",
+    "CG/GaussianBlur.md",
+    "CG/FXAA.md",
     "Math/Liner Algebra.md",
-    "assets/img/CG/RealisticReal-TimeHumanRendering/阴影内区域C计算在位置B传输的光线.jpg",
     "Movie/Roman Holiday.md",
     "Poetry/Classical Chinese Poetry.md",
-    "assets/img/CG/Realistic Real-Time Human Rendering/阴影内区域C计算在位置B传输的光线.jpg",
-    "assets/img.md",
-    "assets/img/Poetry/梦游天姥吟留别-李白.jpeg"
+    "CG/English.md",
+    "CG/English/未命名.md",
+    "assets/img/CG/RealisticReal-TimeHumanRendering/阴影内区域C计算在位置B传输的光线.jpg",
+    "assets/img/CG/Realistic Real-Time Human Rendering/阴影内区域C计算在位置B传输的光线.jpg"
   ]
 }
